@@ -3,9 +3,11 @@ import cors from 'cors';
 import userRoutes from './routes/user.routes.js';
 import postRoutes from './routes/post.routes.js';
 import relationshipRoutes from './routes/relationship.routes.js';
+import dotenv from 'dotenv';
+dotenv.config();
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 5000;
 
 
 app.use(cors());
