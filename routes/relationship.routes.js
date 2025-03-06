@@ -5,28 +5,33 @@ import { users, posts, relationships } from '../data/data.js';
 const router = express.Router();
 
 router.post('/', asyncHandler(async (req, res) => {
-    const { username, postid } = req.query; 
+    const { username, postid } = req.body;  
 
     if (!username || !postid) {
-        throw { statusCode: 400, message: "Username and postid are required" };
+        return res.status(400).json({ message: "Username and postid are required" });
     }
 
-    if (!users.includes(username)) {
-        throw { statusCode: 404, message: "User not found" };
+ 
+    const userExists = users.some(user => user.username === username);
+    if (!userExists) {
+        return res.status(404).json({ message: "User not found" });
     }
 
-    if (!posts[postid]) {
-        throw { statusCode: 404, message: "Post not found" };
+
+    const postIdNumber = Number(postid);
+    if (!posts[postIdNumber]) {
+        return res.status(404).json({ message: "Post not found" });
     }
 
-    if (relationships.find(rel => rel.username === username && rel.postid === postid)) {
-        throw { statusCode: 409, message: "Relationship already exists" };
+ 
+    if (relationships.some(rel => rel.username === username && rel.postid === postIdNumber)) {
+        return res.status(409).json({ message: "Relationship already exists" });
     }
 
-    relationships.push({ username, postid });
+
+    relationships.push({ username, postid: postIdNumber });
     res.status(201).json({ message: "Relationship created successfully", relationships });
 }));
-
 
 router.get('/', asyncHandler(async (req, res) => {
     res.json({ relationships });
