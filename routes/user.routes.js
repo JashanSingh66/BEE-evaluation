@@ -1,62 +1,54 @@
 import express from 'express';
 import asyncHandler from '../utils/asynchandler.js';
-import { users } from '../data/data.js';
+import { users, relationships } from '../data/data.js';
 
 const router = express.Router();
-
 
 router.get('/', asyncHandler(async (req, res) => {
     res.status(200).json({ users });
 }));
 
-
 router.post('/', asyncHandler(async (req, res) => {
-    const { username } = req.body;
+    const { id, username, email } = req.body;
 
-    if (!username) {
-        throw { statusCode: 400, message: "Username is required" };
+    if (!id || !username || !email) {
+        throw { statusCode: 400, message: "ID, Username, and Email are required" };
     }
 
-    if (users.includes(username)) {
-        throw { statusCode: 409, message: "Username already exists" };
+    if (users.some(user => user.id === id || user.username === username || user.email === email)) {
+        throw { statusCode: 409, message: "User with given ID, username, or email already exists" };
     }
 
-    users.push(username);
+    users.push({ id, username, email });
     res.status(201).json({ message: "User registered successfully", users });
 }));
 
-router.put('/:username', asyncHandler(async (req, res) => {
-    const { username } = req.params;
-    const { newUsername } = req.body;
+router.put('/:id', asyncHandler(async (req, res) => {
+    const { id } = req.params;
+    const { newUsername, newEmail } = req.body;
 
-    if (!newUsername) {
-        throw { statusCode: 400, message: "New username is required" };
-    }
-
-    if (!users.includes(username)) {
+    const user = users.find(user => user.id == id);
+    if (!user) {
         throw { statusCode: 404, message: "User not found" };
     }
 
-    if (users.includes(newUsername)) {
-        throw { statusCode: 409, message: "Username already exists" };
-    }
+    if (newUsername) user.username = newUsername;
+    if (newEmail) user.email = newEmail;
 
-    const userIndex = users.indexOf(username);
-    users[userIndex] = newUsername;
-
-    res.json({ message: "Username updated successfully", users });
+    res.json({ message: "User updated successfully", users });
 }));
 
-router.delete('/:username', asyncHandler(async (req, res) => {
-    const { username } = req.params;
+router.delete('/:id', asyncHandler(async (req, res) => {
+    const { id } = req.params;
 
-    if (!users.includes(username)) {
+    const userIndex = users.findIndex(user => user.id == id);
+    if (userIndex === -1) {
         throw { statusCode: 404, message: "User not found" };
     }
 
-    const updatedUsers = users.filter(user => user !== username);
-
-    res.json({ message: "User deleted successfully", users: updatedUsers });
+    users.splice(userIndex, 1);
+    res.json({ message: "User deleted successfully", users });
 }));
 
 export default router;
+
