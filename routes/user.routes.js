@@ -1,7 +1,5 @@
 import express from 'express';
 import asyncHandler from '../utils/asynchandler.js';
-import { users, relationships } from '../data/data.js';
-
 const router = express.Router();
 
 router.get('/', asyncHandler(async (req, res) => {
