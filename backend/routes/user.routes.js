@@ -3,7 +3,7 @@ import asyncHandler from '../utils/asynchandler.js';
 import User from '../models/user.model.js';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-const JWT_SECRET=your-secret-key-here
+const JWT_SECRET="your-secret-key-here"
 const router = express.Router();
 
 // Register user
