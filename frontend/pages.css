@@ -1,0 +1,51 @@
+/* css/pages.css */
+body {
+    margin: 0;
+    font-family: "Segoe UI", sans-serif;
+    background: #f9faff;
+    color: #333;
+  }
+  
+  .navbar {
+    display: flex;
+    justify-content: space-between;
+    padding: 15px 30px;
+    background: linear-gradient(to right, #8f94fb, #4e54c8);
+    color: white;
+  }
+  
+  .logo {
+    font-weight: bold;
+    font-size: 22px;
+  }
+  
+  .nav-links {
+    list-style: none;
+    display: flex;
+    gap: 25px;
+  }
+  
+  .nav-links li a {
+    color: white;
+    text-decoration: none;
+    font-weight: 500;
+    transition: 0.3s ease;
+  }
+  
+  .nav-links li a:hover,
+  .nav-links li a.active {
+    text-decoration: underline;
+    transform: scale(1.05);
+  }
+  
+  .content {
+    padding: 40px;
+    text-align: center;
+  }
+  
+  .socials a {
+    text-decoration: none;
+    color: #4e54c8;
+    margin: 0 10px;
+  }
+  

@@ -1,6 +1,10 @@
 import express from 'express';
 import asyncHandler from '../utils/asynchandler.js';
+
 const router = express.Router();
+
+// In-memory users store
+const users = [];
 
 router.get('/', asyncHandler(async (req, res) => {
     res.status(200).json({ users });
@@ -13,12 +17,18 @@ router.post('/', asyncHandler(async (req, res) => {
         throw { statusCode: 400, message: "ID, Username, and Email are required" };
     }
 
-    if (users.some(user => user.id === id || user.username === username || user.email === email)) {
-        throw { statusCode: 409, message: "User with given ID, username, or email already exists" };
+    const exists = users.some(user =>
+        user.id === id || user.username === username || user.email === email
+    );
+
+    if (exists) {
+        throw { statusCode: 409, message: "User already exists with given ID, username, or email" };
     }
 
-    users.push({ id, username, email });
-    res.status(201).json({ message: "User registered successfully", users });
+    const newUser = { id, username, email };
+    users.push(newUser);
+
+    res.status(201).json({ message: "User registered successfully", user: newUser });
 }));
 
 router.put('/:id', asyncHandler(async (req, res) => {
@@ -33,20 +43,19 @@ router.put('/:id', asyncHandler(async (req, res) => {
     if (newUsername) user.username = newUsername;
     if (newEmail) user.email = newEmail;
 
-    res.json({ message: "User updated successfully", users });
+    res.json({ message: "User updated successfully", user });
 }));
 
 router.delete('/:id', asyncHandler(async (req, res) => {
     const { id } = req.params;
+    const index = users.findIndex(user => user.id == id);
 
-    const userIndex = users.findIndex(user => user.id == id);
-    if (userIndex === -1) {
+    if (index === -1) {
         throw { statusCode: 404, message: "User not found" };
     }
 
-    users.splice(userIndex, 1);
-    res.json({ message: "User deleted successfully", users });
+    const deleted = users.splice(index, 1);
+    res.json({ message: "User deleted successfully", user: deleted[0] });
 }));
 
 export default router;
-

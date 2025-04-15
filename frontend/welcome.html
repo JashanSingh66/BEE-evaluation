@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Welcome</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: url("https://img.freepik.com/free-photo/technology-abstract-background-with-particle-lines_53876-104054.jpg?semt=ais_hybrid&w=740") no-repeat center center fixed;
+      background-size: cover;
+      color: #fff;
+    }
+
+    #navbar {
+      background: rgba(0, 0, 0, 0.5);
+      padding: 15px;
+      position: fixed;
+      top: 0;
+      width: 100%;
+      z-index: 1000;
+    }
+
+    #navbar a {
+      color: white;
+      text-decoration: none;
+      padding: 14px 20px;
+      font-size: 16px;
+      margin: 0 10px;
+      border-radius: 5px;
+    }
+
+    #navbar a:hover {
+      background: #483d8b;
+    }
+
+    #welcomeContainer {
+      max-width: 500px;
+      margin: 100px auto;
+      padding: 40px;
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(15px);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      text-align: center;
+    }
+
+    .btn {
+      padding: 12px 25px;
+      background: #6a5acd;
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    .btn:hover {
+      background: #483d8b;
+    }
+
+    .countdown {
+      font-size: 15px;
+      opacity: 0.85;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+
+  <div id="navbar">
+    <a href="home.html">Home</a>
+    <a href="about.html">About</a>
+    <a href="services.html">Services</a>
+    <a href="contact.html">Contact</a>
+  </div>
+
+  <div id="welcomeContainer">
+    <h2>👋 Welcome, <span id="welcomeName">User</span>!</h2>
+    <p>You have successfully registered. Enjoy exploring the site!</p>
+    <p><strong>Email:</strong> <span id="userEmail"></span></p>
+
+    <div class="countdown">
+      Redirecting in <span id="timer">10</span> seconds...
+    </div>
+    <button class="btn" onclick="redirectToHome()">Go to Home</button>
+  </div>
+
+  <script>
+    const name = localStorage.getItem("userName");
+    const email = localStorage.getItem("userEmail");
+
+    if (!name || !email) {
+      alert("❌ Please login or register first.");
+      window.location.href = "index.html";
+    } else {
+      document.getElementById("welcomeName").textContent = name;
+      document.getElementById("userEmail").textContent = email;
+    }
+
+    let countdown = 10;
+    let timer = document.getElementById("timer");
+    let interval = setInterval(() => {
+      countdown--;
+      timer.textContent = countdown;
+      if (countdown === 0) {
+        clearInterval(interval);
+        redirectToHome();
+      }
+    }, 1000);
+
+    function redirectToHome() {
+      window.location.href = "home.html";
+    }
+  </script>
+
+</body>
+</html>
