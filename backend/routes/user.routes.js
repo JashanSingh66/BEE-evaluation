@@ -3,8 +3,10 @@ import asyncHandler from '../utils/asynchandler.js';
 import User from '../models/user.model.js';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-const JWT_SECRET="your-secret-key-here"
+import authMiddleware from '../utils/auth.js';
+
 const router = express.Router();
+const JWT_SECRET =  "your-secret-key-here";
 
 // Register user
 router.post('/register', asyncHandler(async (req, res) => {
@@ -14,7 +16,7 @@ router.post('/register', asyncHandler(async (req, res) => {
         throw { statusCode: 400, message: "Username, Email, and Password are required" };
     }
 
-    const userExists = await User.findOne({ $or: [ { email }, { username } ] });
+    const userExists = await User.findOne({ $or: [{ email }, { username }] });
     if (userExists) {
         throw { statusCode: 409, message: "User already exists with given email or username" };
     }
@@ -22,41 +24,58 @@ router.post('/register', asyncHandler(async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
     const user = await User.create({ username, email, password: hashedPassword });
 
-    res.status(201).json({ message: "User registered successfully", user: { id: user._id, username, email } });
+    const token = jwt.sign({ id: user._id }, JWT_SECRET, { expiresIn: '1d' });
+
+    res.status(201).json({
+        message: "User registered successfully",
+        token,
+        user: { id: user._id, username: user.username, email: user.email },
+    });
 }));
 
 // Login user
 router.post('/login', asyncHandler(async (req, res) => {
-    const { username, password } = req.body;
+    console.log(req.body);  // Add this line to check the incoming data
+    const { email, password } = req.body;
 
-    const user = await User.findOne({ username });
+    const user = await User.findOne({ email });  // Check for email only
     if (!user || !(await bcrypt.compare(password, user.password))) {
-        throw { statusCode: 401, message: "Invalid username or password" };
+        throw { statusCode: 401, message: "Invalid email or password" };
     }
 
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1d' });
+    const token = jwt.sign({ id: user._id },JWT_SECRET, { expiresIn: '1d' });
     res.json({ message: "Login successful", token, user: { id: user._id, username: user.username, email: user.email } });
 }));
 
-// Logout user (handled client-side by deleting token)
+// Logout - handled on client
 router.post('/logout', asyncHandler(async (req, res) => {
-    res.json({ message: "Logout successful (handled client-side)" });
+    res.json({ message: "Logout successful (handled on client)" });
 }));
 
-// Get user profile
-router.get('/profile/:id', asyncHandler(async (req, res) => {
+// Get user profile (protected)
+router.get('/profile/:id', authMiddleware, asyncHandler(async (req, res) => {
     const { id } = req.params;
+
+    if (req.userId !== id) {
+        throw { statusCode: 403, message: "Unauthorized access" };
+    }
+
     const user = await User.findById(id).select('-password');
     if (!user) {
         throw { statusCode: 404, message: "User not found" };
     }
+
     res.json({ profile: user });
 }));
 
-// Update user
-router.put('/:id', asyncHandler(async (req, res) => {
+// Update user (protected)
+router.put('/:id', authMiddleware, asyncHandler(async (req, res) => {
     const { id } = req.params;
     const { newUsername, newEmail } = req.body;
+
+    if (req.userId !== id) {
+        throw { statusCode: 403, message: "Unauthorized" };
+    }
 
     const user = await User.findById(id);
     if (!user) {
@@ -67,20 +86,31 @@ router.put('/:id', asyncHandler(async (req, res) => {
     if (newEmail) user.email = newEmail;
 
     await user.save();
-    res.json({ message: "User updated successfully", user: { id: user._id, username: user.username, email: user.email } });
+
+    res.json({
+        message: "User updated successfully",
+        user: { id: user._id, username: user.username, email: user.email },
+    });
 }));
 
-// Delete user
-router.delete('/:id', asyncHandler(async (req, res) => {
+// Delete user (protected)
+router.delete('/:id', authMiddleware, asyncHandler(async (req, res) => {
     const { id } = req.params;
-    const user = await User.findById(id);
 
+    if (req.userId !== id) {
+        throw { statusCode: 403, message: "Unauthorized" };
+    }
+
+    const user = await User.findById(id);
     if (!user) {
         throw { statusCode: 404, message: "User not found" };
     }
 
     await user.remove();
-    res.json({ message: "User deleted successfully", user: { id: user._id, username: user.username, email: user.email } });
+    res.json({
+        message: "User deleted successfully",
+        user: { id: user._id, username: user.username, email: user.email },
+    });
 }));
 
 export default router;
