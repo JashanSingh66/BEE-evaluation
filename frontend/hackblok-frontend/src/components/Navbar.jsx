@@ -15,6 +15,8 @@ export default function Navbar() {
       {isLoggedIn ? (
         <>
           <Link to="/create">Create Post</Link>
+          <a href="/edit-profile">Edit Profile</a>
+          <Link to="/profile">Profile</Link> 
           <button onClick={handleLogout}>Logout</button>
         </>
       ) : (

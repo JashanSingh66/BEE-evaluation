@@ -47,70 +47,32 @@ router.post('/login', asyncHandler(async (req, res) => {
     res.json({ message: "Login successful", token, user: { id: user._id, username: user.username, email: user.email } });
 }));
 
-// Logout - handled on client
 router.post('/logout', asyncHandler(async (req, res) => {
     res.json({ message: "Logout successful (handled on client)" });
 }));
 
-// Get user profile (protected)
-router.get('/profile/:id', authMiddleware, asyncHandler(async (req, res) => {
-    const { id } = req.params;
 
-    if (req.userId !== id) {
-        throw { statusCode: 403, message: "Unauthorized access" };
-    }
+// Update current user
+router.put('/me', authMiddleware, asyncHandler(async (req, res) => {
+    const { username, email } = req.body;
+    const user = await User.findById(req.userId);
+    if (!user) throw { statusCode: 404, message: "User not found" };
 
-    const user = await User.findById(id).select('-password');
-    if (!user) {
-        throw { statusCode: 404, message: "User not found" };
-    }
-
-    res.json({ profile: user });
-}));
-
-// Update user (protected)
-router.put('/:id', authMiddleware, asyncHandler(async (req, res) => {
-    const { id } = req.params;
-    const { newUsername, newEmail } = req.body;
-
-    if (req.userId !== id) {
-        throw { statusCode: 403, message: "Unauthorized" };
-    }
-
-    const user = await User.findById(id);
-    if (!user) {
-        throw { statusCode: 404, message: "User not found" };
-    }
-
-    if (newUsername) user.username = newUsername;
-    if (newEmail) user.email = newEmail;
-
+    user.username = username || user.username;
+    user.email = email || user.email;
     await user.save();
 
-    res.json({
-        message: "User updated successfully",
-        user: { id: user._id, username: user.username, email: user.email },
-    });
+    res.json({ message: "Profile updated", user: { id: user._id, username: user.username, email: user.email } });
 }));
 
-// Delete user (protected)
-router.delete('/:id', authMiddleware, asyncHandler(async (req, res) => {
-    const { id } = req.params;
+// Get the profile of the logged-in user
+router.get('/profile', authMiddleware, asyncHandler(async (req, res) => {
+    const user = await User.findById(req.userId);
 
-    if (req.userId !== id) {
-        throw { statusCode: 403, message: "Unauthorized" };
-    }
-
-    const user = await User.findById(id);
     if (!user) {
-        throw { statusCode: 404, message: "User not found" };
+        return res.status(404).json({ message: "User not found" });
     }
-
-    await user.remove();
-    res.json({
-        message: "User deleted successfully",
-        user: { id: user._id, username: user.username, email: user.email },
-    });
+    console.log(user);
+    res.json({ user });
 }));
-
 export default router;

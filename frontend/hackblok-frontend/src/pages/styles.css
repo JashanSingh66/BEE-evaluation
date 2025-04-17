@@ -133,3 +133,23 @@ button:hover {
         padding: 0.6rem 1.2rem;
     }
 }
+
+.actions {
+    margin-top: 1rem;
+    display: flex;
+    gap: 0.5rem;
+  }
+  
+  .actions button {
+    background-color: #4b6cb7;
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+  
+  .actions button:hover {
+    opacity: 0.9;
+  }
+  

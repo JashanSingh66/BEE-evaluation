@@ -4,7 +4,7 @@ import dotenv from 'dotenv';
 import userRoutes from './routes/user.routes.js';
 import postRoutes from './routes/post.routes.js';
 import connectDb from './db/db.js';
-import errorHandler from './utils/errorhandler.js'; // Custom error middleware
+import errorHandler from './utils/errorhandler.js'; 
 
 dotenv.config();
 connectDb();
@@ -21,9 +21,9 @@ app.use('/users', userRoutes);
 app.use('/posts', postRoutes);
 
 // Error handler
-app.use(errorHandler); // This should be after routes
+app.use(errorHandler); 
 
-// Start server
+
 app.listen(PORT, () => {
-    console.log(`🚀 Server is running on http://localhost:${PORT}`);
+    console.log(`Server is running on http://localhost:${PORT}`);
 });

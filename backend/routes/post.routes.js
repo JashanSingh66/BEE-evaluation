@@ -5,13 +5,13 @@ import authMiddleware from '../utils/auth.js';
 
 const router = express.Router();
 
-// Get all posts (public)
+// Get all posts 
 router.get('/', asyncHandler(async (req, res) => {
     const posts = await Post.find().sort({ createdAt: -1 });
     res.json({ posts });
 }));
 
-// Create a new post (protected)
+// Create a new post 
 router.post('/', authMiddleware, asyncHandler(async (req, res) => {
     const { title, content, date, prize, organizer } = req.body;
 
@@ -31,17 +31,7 @@ router.post('/', authMiddleware, asyncHandler(async (req, res) => {
     res.status(201).json({ message: "Post created successfully", post: newPost });
 }));
 
-// Get a single post by ID (public)
-router.get('/:id', asyncHandler(async (req, res) => {
-    const { id } = req.params;
-    const post = await Post.findById(id);
 
-    if (!post) {
-        return res.status(404).json({ message: "Post not found" });
-    }
-
-    res.json({ post });
-}));
 
 // Update a post by ID (protected)
 router.put('/:id', authMiddleware, asyncHandler(async (req, res) => {
@@ -66,24 +56,6 @@ router.put('/:id', authMiddleware, asyncHandler(async (req, res) => {
 
     await post.save();
     res.json({ message: "Post updated successfully", post });
-}));
-
-// Delete a post by ID (protected)
-router.delete('/:id', authMiddleware, asyncHandler(async (req, res) => {
-    const { id } = req.params;
-
-    const post = await Post.findById(id);
-    if (!post) {
-        return res.status(404).json({ message: "Post not found" });
-    }
-
-    // Optional: Check if user is the owner of the post
-    if (post.createdBy.toString() !== req.userId) {
-        return res.status(403).json({ message: "You are not authorized to delete this post" });
-    }
-
-    await post.remove();
-    res.json({ message: "Post deleted successfully", post });
 }));
 
 export default router;
