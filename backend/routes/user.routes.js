@@ -51,6 +51,11 @@ router.post('/logout', asyncHandler(async (req, res) => {
     res.json({ message: "Logout successful (handled on client)" });
 }));
 
+// Get current user profile
+router.get('/profile/me', authMiddleware, asyncHandler(async (req, res) => {
+    const user = await User.findById(req.userId).select('-password');
+    res.json({ profile: user });
+}));
 
 // Update current user
 router.put('/me', authMiddleware, asyncHandler(async (req, res) => {
@@ -72,7 +77,7 @@ router.get('/profile', authMiddleware, asyncHandler(async (req, res) => {
     if (!user) {
         return res.status(404).json({ message: "User not found" });
     }
-    console.log(user);
+
     res.json({ user });
 }));
 export default router;
