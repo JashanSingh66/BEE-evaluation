@@ -58,7 +58,7 @@ export default function Home() {
 
   return (
     <div className="container">
-      <h1>All Hackathons</h1>
+      <h1>Explore the Content</h1>
       {posts.map(post => (
         <div key={post._id} className="card">
           <h2>{post.title}</h2>
@@ -66,6 +66,11 @@ export default function Home() {
           <p><strong>Date:</strong> {post.date}</p>
           <p><strong>Prize:</strong> {post.prize}</p>
           <p><strong>Organizer:</strong> {post.organizer}</p>
+
+          {/* Display the image if it exists */}
+          {post.image && (
+            <img src={post.image} alt={post.title} className="post-image" />
+          )}
 
           {post.createdBy === userId && (
             <div className="actions">

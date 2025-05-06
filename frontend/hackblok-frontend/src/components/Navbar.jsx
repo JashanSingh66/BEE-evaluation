@@ -14,10 +14,11 @@ export default function Navbar() {
       <Link to="/">Home</Link>
       {isLoggedIn ? (
         <>
+        <Link to="/post">Posts</Link>
           <Link to="/create">Create Post</Link>
           <a href="/edit-profile">Edit Profile</a>
           <Link to="/profile">Profile</Link> 
-          <button onClick={handleLogout}>Logout</button>
+          <button onClick={handleLogout} className='logout-btn'>Logout</button>
         </>
       ) : (
         <>

@@ -11,6 +11,10 @@ const postSchema = new mongoose.Schema({
     ref: 'User',
     required: true,
   },
+  image: {
+    type: String,  // You can store the file path or URL here
+    required: false,  // If you don't always want an image to be required
+  },
 }, { timestamps: true });
 
 export default mongoose.model('Post', postSchema);

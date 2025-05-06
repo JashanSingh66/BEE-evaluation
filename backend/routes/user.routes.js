@@ -22,6 +22,7 @@ router.post('/register', asyncHandler(async (req, res) => {
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
+    
     const user = await User.create({ username, email, password: hashedPassword });
 
     const token = jwt.sign({ id: user._id }, JWT_SECRET, { expiresIn: '1d' });
@@ -35,10 +36,10 @@ router.post('/register', asyncHandler(async (req, res) => {
 
 // Login user
 router.post('/login', asyncHandler(async (req, res) => {
-    console.log(req.body);  // Add this line to check the incoming data
+    console.log(req.body);
     const { email, password } = req.body;
 
-    const user = await User.findOne({ email });  // Check for email only
+    const user = await User.findOne({ email });  
     if (!user || !(await bcrypt.compare(password, user.password))) {
         throw { statusCode: 401, message: "Invalid email or password" };
     }

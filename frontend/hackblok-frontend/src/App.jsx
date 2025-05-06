@@ -8,12 +8,14 @@ import ProtectedRoute from './utils/ProtectedRoute';
 import EditProfile from './pages/EditProfile';
 import EditPost from './pages/EditPost';
 import Profile from './pages/Profile';
+import Extra from './pages/Extra';
 export default function App() {
   return (
     <Router>
       <Navbar />
       <Routes>
-        <Route path="/" element={<ProtectedRoute><Home /></ProtectedRoute>} />
+        <Route path="/" element={<ProtectedRoute><Extra /></ProtectedRoute>} />
+        <Route path='/post' element={<ProtectedRoute><Home /></ProtectedRoute>}></Route>
         <Route path="/create" element={<ProtectedRoute><CreatePost /></ProtectedRoute>} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
