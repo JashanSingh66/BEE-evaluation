@@ -130,5 +130,23 @@ router.put('/:id', authMiddleware, upload, asyncHandler(async (req, res) => {
   res.json({ message: "Post updated successfully", post });
 }));
 
+// Delete a post by ID (protected)
+router.delete('/:id', authMiddleware, asyncHandler(async (req, res) => {
+  const { id } = req.params;
+
+  const post = await Post.findById(id);
+  if (!post) {
+      return res.status(404).json({ message: "Post not found" });
+  }
+
+  // Check if the logged-in user is the creator of the post
+  if (post.createdBy.toString() !== req.userId) {
+      return res.status(403).json({ message: "You are not authorized to delete this post" });
+  }
+
+  await post.remove(); // Delete the post
+
+  res.json({ message: "Post deleted successfully" });
+}));
 
 export default router;
